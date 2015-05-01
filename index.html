@@ -4,41 +4,52 @@
     <meta charset="UTF-8">
     <title>Document</title>
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script>
-        var hide   = false;
-        var fake   = 'Caro senhor do universo';
-        var answer = '';
+    <script type="text/javascript">
+        Guru = function(textFieldId, buttonId) {
+            this.answer = '';
+            this.hotKey = 33;
+            this.hide   = false;
+            this.fake   = 'Caro e supremo senhor que do universo tudo sabe,';
+            _self       = this;
+            this.bindEvents(textFieldId, buttonId);
+        };
 
-        $(function(){
-            $('input').keypress(function(e){
-                hotKey   = 33;
-                isHotKey = e.keyCode == hotKey;
-                hide     = isHotKey ? !hide : hide;
+        Guru.prototype.bindEvents = function(textFieldId, buttonId) {
+            $(document).on('keypress', '#' + textFieldId, this.think);
+            $(document).on('click', '#' + buttonId, this.reply);
+        };
 
-                console.log(hide);
+        Guru.prototype.think = function(e){
+            var e        = window.event ? event : e;
+            var isHotKey = e.keyCode == _self.hotKey;
+            _self.hide   = isHotKey ? !_self.hide : _self.hide;
 
-                if(isHotKey)
-                    return false;
+            if(_self.hide)
+                $(this).addClass('hide');
+            else
+                $(this).removeClass('hide');
 
-                if(hide)
-                {
-                    answer += String.fromCharCode(e.charCode);
+            if(isHotKey)
+                return false;
 
-                    console.log(answer);
+            if(_self.hide)
+            {
+                _self.answer += String.fromCharCode(e.charCode);
+                var length    = $(this).val().length;
+                var fakeChar  = length < _self.fake.length ? _self.fake[length] : ' ';
 
-                    $(this).val($(this).val() + fake[$(this).val().length]);
+                $(this).val($(this).val() + fakeChar);
 
-                    return false;
-                }
+                return false;
+            }
+        }
 
-            });
+        Guru.prototype.reply = function(){
+            alert(_self.answer);
+            _self.answer = '';
+        }
 
-            $('a').click(function(){
-                alert(answer);
-                answer = '';
-            });
-        });
-
+        new Guru('question', 'ask');
     </script>
     <style>
         body {
@@ -54,6 +65,7 @@
             font: 36px arial;
             padding: 10px;
             width: 100%;
+            outline: none;
         }
         a {
             display: block;
@@ -68,12 +80,15 @@
             padding: 20px;
             text-decoration: none;
         }
+        .hide {
+            border:1px solid #000;
+        }
     </style>
 </head>
 <body>
     <div>
-        <input type="text">
-        <a href="#">Perguntar!</a>
+        <input type="text" id="question">
+        <a href="#" id="ask">Perguntar!</a>
     </div>
 </body>
 </html>
